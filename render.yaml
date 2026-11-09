@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: kpss-tarih-duello
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TEST_PURCHASES
+        value: "1"

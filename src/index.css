@@ -1,0 +1,204 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Nunito:wght@500;700;800;900&display=swap');
+
+:root {
+  --navy-900: #050d1f;
+  --navy-800: #0a1a3a;
+  --navy-700: #112650;
+  --navy-600: #1a3668;
+  --gold-300: #ffe08a;
+  --gold-400: #f6c85f;
+  --gold-500: #d4a843;
+  --gold-700: #8a6a1f;
+  --green: #2ecc71;
+  --red: #ff5a5f;
+  --blue: #4cc9f0;
+  --font-title: 'Cinzel', 'Georgia', serif;
+  --font-body: 'Nunito', 'Segoe UI', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body, #root {
+  width: 100%;
+  min-height: 100%;
+  font-family: var(--font-body);
+  color: #fff;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  background: #02060f;
+}
+
+/* Telefon çerçevesi içinde ana uygulama alanı + Osmanlı desenli arka plan */
+#root {
+  max-width: 480px;
+  position: relative;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(246, 200, 95, 0.18), transparent 55%),
+    radial-gradient(circle at 50% 100%, rgba(76, 201, 240, 0.12), transparent 50%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='none' stroke='%23d4a843' stroke-opacity='0.09' stroke-width='1'%3E%3Cpath d='M40 4l9 18 18 9-18 9-9 18-9-18-18-9 18-9z'/%3E%3Ccircle cx='40' cy='40' r='6'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(180deg, var(--navy-800) 0%, var(--navy-900) 100%);
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: var(--gold-500); border-radius: 2px; }
+
+/* ---------- Ortak bileşenler ---------- */
+.title-font { font-family: var(--font-title); letter-spacing: 1px; }
+
+.gold-text {
+  background: linear-gradient(180deg, var(--gold-300), var(--gold-500) 60%, var(--gold-700));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-family: var(--font-title);
+  font-weight: 800;
+}
+
+/* Süslü altın çerçeveli panel */
+.panel {
+  position: relative;
+  background: linear-gradient(160deg, rgba(26, 54, 104, 0.85), rgba(10, 26, 58, 0.92));
+  border: 2px solid var(--gold-500);
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), inset 0 0 0 3px rgba(5, 13, 31, 0.9), inset 0 0 0 4px rgba(212, 168, 67, 0.35);
+  backdrop-filter: blur(6px);
+}
+
+/* Birincil altın buton */
+.btn-gold {
+  font-family: var(--font-title);
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #2a1c00;
+  background: linear-gradient(180deg, var(--gold-300) 0%, var(--gold-400) 45%, var(--gold-500) 100%);
+  border: 2px solid var(--gold-300);
+  border-radius: 18px;
+  padding: 16px 24px;
+  cursor: pointer;
+  box-shadow: 0 6px 0 var(--gold-700), 0 10px 22px rgba(246, 200, 95, 0.35);
+  transition: transform 0.12s, box-shadow 0.12s, filter 0.2s;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.btn-gold:hover { filter: brightness(1.08); }
+.btn-gold:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--gold-700), 0 4px 10px rgba(246, 200, 95, 0.3); }
+.btn-gold:disabled { filter: grayscale(0.7); opacity: 0.6; cursor: not-allowed; }
+
+/* İkincil (lacivert-altın çizgili) buton */
+.btn-navy {
+  font-family: var(--font-body);
+  font-weight: 800;
+  color: var(--gold-300);
+  background: linear-gradient(180deg, var(--navy-600), var(--navy-800));
+  border: 2px solid var(--gold-500);
+  border-radius: 16px;
+  padding: 14px 20px;
+  cursor: pointer;
+  box-shadow: 0 5px 0 #050d1f, 0 8px 16px rgba(0, 0, 0, 0.4);
+  transition: transform 0.12s, box-shadow 0.12s, filter 0.2s;
+}
+.btn-navy:hover { filter: brightness(1.2); }
+.btn-navy:active { transform: translateY(3px); box-shadow: 0 2px 0 #050d1f; }
+.btn-navy:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Küçük para/istatistik hapı */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  background: rgba(5, 13, 31, 0.8);
+  border: 1.5px solid rgba(212, 168, 67, 0.6);
+  border-radius: 999px;
+}
+
+/* Cevap seçeneği butonu */
+.answer-btn {
+  position: relative;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #fff;
+  background: linear-gradient(180deg, var(--navy-600), var(--navy-700));
+  border: 2px solid rgba(212, 168, 67, 0.55);
+  border-radius: 16px;
+  padding: 14px 10px 14px 46px;
+  min-height: 74px;
+  cursor: pointer;
+  text-align: left;
+  box-shadow: 0 5px 0 #050d1f;
+  transition: transform 0.12s, box-shadow 0.12s, background 0.25s, border-color 0.25s;
+}
+.answer-btn .letter {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-title);
+  font-weight: 800;
+  color: #2a1c00;
+  background: linear-gradient(180deg, var(--gold-300), var(--gold-500));
+}
+.answer-btn:hover:not(:disabled) { border-color: var(--gold-300); transform: translateY(-2px); }
+.answer-btn:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 2px 0 #050d1f; }
+.answer-btn.correct { background: linear-gradient(180deg, #34d97b, #1e9e52); border-color: #b9ffd2; }
+.answer-btn.wrong { background: linear-gradient(180deg, #ff6b70, #c0262c); border-color: #ffc2c4; animation: shakeWrong 0.4s; }
+.answer-btn.opp { background: linear-gradient(180deg, #ff9a3c, #c25a00); border-color: #ffd1a0; }
+.answer-btn.eliminated { opacity: 0.25; filter: grayscale(1); }
+
+/* Soru parşömeni */
+.parchment {
+  position: relative;
+  color: #2b1b05;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(255, 255, 255, 0.5), transparent 50%),
+    linear-gradient(160deg, #f8e8bd, #e3c383);
+  border: 3px solid var(--gold-700);
+  border-radius: 18px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.55), inset 0 0 0 3px #f6dc9b, inset 0 0 28px rgba(138, 106, 31, 0.35);
+}
+
+/* Süre çubuğu */
+.timer-track {
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(5, 13, 31, 0.8);
+  border: 2px solid var(--gold-500);
+  overflow: hidden;
+}
+.timer-fill { height: 100%; border-radius: 999px; box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.35); }
+
+/* Alt gezinme çubuğu */
+.nav-bar {
+  background: linear-gradient(180deg, var(--navy-700), var(--navy-900));
+  border-top: 2px solid var(--gold-500);
+  box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* ---------- Animasyonlar ---------- */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+@keyframes glow { 0%,100% { box-shadow: 0 6px 0 var(--gold-700), 0 0 14px rgba(246,200,95,.35); } 50% { box-shadow: 0 6px 0 var(--gold-700), 0 0 34px rgba(246,200,95,.8); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes bounceIn { 0% { transform: scale(0); opacity: 0; } 55% { transform: scale(1.15); } 100% { transform: scale(1); opacity: 1; } }
+@keyframes shakeWrong { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+@keyframes timerPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+@keyframes slideInLeft { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes countDown { 0% { transform: scale(2); opacity: 0; } 50% { transform: scale(1); opacity: 1; } 90% { opacity: 1; } 100% { transform: scale(0.5); opacity: 0; } }
+@keyframes confetti { 0% { transform: translateY(-10px) rotate(0); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+@keyframes shine { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
