@@ -1,7 +1,7 @@
 {
-  "name": "Tarih Düello - KPSS Bilgi Yarışması",
-  "short_name": "Tarih Düello",
-  "description": "KPSS Tarih online bilgi düellosu ve soru yarışması.",
+  "name": "Asırların Düellosu: KPSS Tarih",
+  "short_name": "Asırların Düellosu",
+  "description": "1000+ soruluk gerçek zamanlı online KPSS Tarih bilgi düellosu.",
   "lang": "tr",
   "start_url": "/",
   "scope": "/",

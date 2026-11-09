@@ -28,8 +28,8 @@ export default function MainMenu({ onStartDuel, onQuickQuiz, onArcade, playerDat
       {/* Logo */}
       <div style={{ textAlign: 'center', marginTop: 8, animation: 'fadeIn .6s .1s both' }}>
         <div style={{ fontSize: '3.4rem', animation: 'float 3s ease-in-out infinite', filter: 'drop-shadow(0 6px 14px rgba(246,200,95,.5))' }}>🏛️</div>
-        <h1 className="gold-text" style={{ fontSize: '2.3rem', lineHeight: 1.1, letterSpacing: 2 }}>TARİH DÜELLO</h1>
-        <div style={{ color: 'var(--gold-300)', fontWeight: 700, fontSize: '.8rem', letterSpacing: 4, marginTop: 4 }}>✦ KPSS BİLGİ YARIŞMASI ✦</div>
+        <h1 className="gold-text" style={{ fontSize: '1.95rem', lineHeight: 1.15, letterSpacing: 1.5 }}>ASIRLARIN DÜELLOSU</h1>
+        <div style={{ color: 'var(--gold-300)', fontWeight: 700, fontSize: '.8rem', letterSpacing: 4, marginTop: 4 }}>✦ KPSS TARİH YARIŞMASI ✦</div>
       </div>
 
       {/* Oyun modları */}
