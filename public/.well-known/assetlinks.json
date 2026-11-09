@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.erdem9d.kpsstarih",
+        "sha256_cert_fingerprints": ["B1:E2:29:76:8D:D2:2A:81:06:0D:76:DE:B0:FC:89:97:FC:C3:4D:16:E6:63:D7:46:49:AD:FA:96:E7:E6:12:A1"]
+      }
+    }]
