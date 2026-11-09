@@ -44,9 +44,10 @@ function serveStatic(req, res) {
   if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) file = path.join(DIST, 'index.html');
   if (!fs.existsSync(file)) return false;
   const ext = path.extname(file).toLowerCase();
+  const isAsset = pathname.startsWith('/assets/');
   res.writeHead(200, {
     'Content-Type': MIME[ext] || 'application/octet-stream',
-    'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=31536000, immutable',
+    'Cache-Control': isAsset ? 'public, max-age=31536000, immutable' : 'no-cache',
   });
   fs.createReadStream(file).pipe(res);
   return true;
