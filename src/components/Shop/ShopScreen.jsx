@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 
 const GEM_PACKS = [
-  { id: 'gems_100', name: '100 Elmas', amount: '100', price: '$0.99', icon: '💎', size: 44 },
-  { id: 'gems_500', name: '500 Elmas', amount: '500', price: '$3.99', icon: '💎', size: 54, badge: 'EN ÇOK SATAN' },
-  { id: 'gems_1200', name: '1200 Elmas', amount: '1200', price: '$7.99', icon: '💎', size: 64, badge: 'EN İYİ DEĞER', best: true },
+  { id: 'gems_100', name: '100 Elmas', amount: '100', price: '100 🪙', icon: '💎', size: 44 },
+  { id: 'gems_500', name: '500 Elmas', amount: '500', price: '400 🪙', icon: '💎', size: 54, badge: 'EN ÇOK SATAN' },
+  { id: 'gems_1200', name: '1200 Elmas', amount: '1200', price: '800 🪙', icon: '💎', size: 64, badge: 'EN İYİ DEĞER', best: true },
 ];
 
 const POWERUPS = [
@@ -18,6 +18,7 @@ const COSMETICS = [
 ];
 
 const ERRORS = {
+  insufficient_coins: 'Yeterli altının yok! Düello veya Arcade oynayarak altın kazan 🪙',
   insufficient_diamonds: 'Yeterli elmasın yok. Elmas paketlerine göz at 💎',
   already_owned: 'Bu ürüne zaten sahipsin.',
   payments_disabled: 'Gerçek ödeme henüz aktif değil.',
@@ -188,11 +189,6 @@ export default function ShopScreen({ playerData, online = true, onPurchase, onBa
                   <b style={{ color: 'var(--gold-300)' }}>{selectedItem?.name}</b> ürününü satın almak istiyor musunuz?
                 </p>
                 <p className="pill" style={{ marginTop: 12, color: 'var(--gold-300)' }}>Fiyat: {selectedItem?.price}</p>
-                {selectedItem?.id?.startsWith('gems_') && (
-                  <p style={{ marginTop: 10, fontSize: 11, color: '#9fb0d4', lineHeight: 1.4 }}>
-                    🧪 Test sürümü: gerçek ödeme alınmaz, elmaslar ücretsiz eklenir.
-                  </p>
-                )}
                 {error && <p style={{ marginTop: 12, fontSize: 13, fontWeight: 800, color: '#ff8a8f' }}>{error}</p>}
                 <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
                   <button className="btn-navy" style={{ flex: 1, padding: '10px' }} onClick={() => setShowModal(false)}>İptal</button>

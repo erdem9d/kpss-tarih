@@ -217,16 +217,16 @@ export function arcadeReward(user, score) {
 }
 
 // ---------- Mağaza ----------
-export function purchase(user, itemId, { testMode }) {
+export function purchase(user, itemId) {
   const item = SHOP[itemId];
   if (!item) return { ok: false, error: 'unknown_item' };
 
   if (item.kind === 'gems') {
-    // Gerçek para: Google Play Billing makbuz doğrulaması eklenene kadar yalnızca test modunda.
-    if (!testMode) return { ok: false, error: 'payments_disabled' };
+    if (user.coins < item.coins) return { ok: false, error: 'insufficient_coins' };
+    user.coins -= item.coins;
     user.diamonds += item.amount;
     save();
-    return { ok: true, testMode: true };
+    return { ok: true };
   }
 
   if (user.diamonds < item.diamonds) return { ok: false, error: 'insufficient_diamonds' };
