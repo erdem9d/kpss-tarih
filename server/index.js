@@ -8,8 +8,8 @@ import * as db from './db.js';
 
 const PORT = process.env.PORT || 3001;
 const BOT_AFTER_MS = Number(process.env.BOT_AFTER_MS || 7000);
-// Gerçek para ödemesi (Google Play Billing doğrulaması) hazır olana kadar elmas paketleri yalnızca test modunda verilir.
-const TEST_PURCHASES = process.env.NODE_ENV !== 'production' || process.env.TEST_PURCHASES === '1';
+// Gerçek para ödemesi (Google Play Billing doğrulaması) bağlanana kadar elmas paketleri demo/test modunda verilir.
+const TEST_PURCHASES = process.env.TEST_PURCHASES !== '0';
 
 const BOT_NAMES = ['TarihKurdu', 'KpssUzmani', 'OsmanliTorunu', 'Atabey', 'Sultan123', 'Bilge_Kagan', 'Kosem', 'FatihHayrani'];
 const BOT_AVATARS = ['🦁', '🦅', '🐺', '🤴', '🥷', '🌙'];
