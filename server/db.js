@@ -77,27 +77,46 @@ export function findByToken(token) {
   return id ? data.users[id] : null;
 }
 
-export function createUser() {
-  const id = crypto.randomUUID();
-  const token = crypto.randomBytes(32).toString('hex');
-  let username;
-  do {
-    username = `Oyuncu${Math.floor(1000 + Math.random() * 9000)}`;
-  } while (nameTaken(username));
+export function createUser(restore = {}) {
+  const id = (typeof restore.id === 'string' && restore.id.length >= 8) ? restore.id : crypto.randomUUID();
+  const token = (typeof restore.token === 'string' && restore.token.length >= 16)
+    ? restore.token
+    : crypto.randomBytes(32).toString('hex');
+
+  let username = cleanName(restore.username);
+  if (!username || nameTaken(username, id)) {
+    do {
+      username = `Oyuncu${Math.floor(1000 + Math.random() * 9000)}`;
+    } while (nameTaken(username, id));
+  }
+
+  const avatarPack = Boolean(restore.avatarPack);
+  const allAvatars = avatarPack ? [...BASE_AVATARS, ...PREMIUM_AVATARS] : BASE_AVATARS;
+  const avatar = allAvatars.includes(restore.avatar) ? restore.avatar : BASE_AVATARS[0];
 
   const user = {
     id,
     tokenHash: hash(token),
     username,
-    avatar: BASE_AVATARS[0],
-    coins: START.coins,
-    diamonds: START.diamonds,
-    elo: START.elo,
-    stats: { totalGames: 0, wins: 0, losses: 0, draws: 0, correctAnswers: 0 },
-    inventory: { extraTime: 0, eliminateWrong: 0, shield: 0 },
-    avatarPack: false,
-    goldBoost: 0,
-    history: [],
+    avatar,
+    coins: Number.isFinite(restore.coins) ? Math.max(0, Math.floor(restore.coins)) : START.coins,
+    diamonds: Number.isFinite(restore.diamonds) ? Math.max(0, Math.floor(restore.diamonds)) : START.diamonds,
+    elo: Number.isFinite(restore.elo) ? Math.max(0, Math.floor(restore.elo)) : START.elo,
+    stats: {
+      totalGames: Number(restore.stats?.totalGames) || 0,
+      wins: Number(restore.stats?.wins) || 0,
+      losses: Number(restore.stats?.losses) || 0,
+      draws: Number(restore.stats?.draws) || 0,
+      correctAnswers: Number(restore.stats?.correctAnswers) || 0,
+    },
+    inventory: {
+      extraTime: Number(restore.inventory?.extraTime) || 0,
+      eliminateWrong: Number(restore.inventory?.eliminateWrong) || 0,
+      shield: Number(restore.inventory?.shield) || 0,
+    },
+    avatarPack,
+    goldBoost: Number(restore.goldBoost) || 0,
+    history: Array.isArray(restore.history) ? restore.history.slice(0, 10) : [],
     eloLog: [],
     lastArcadeAt: 0,
     createdAt: Date.now(),

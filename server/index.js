@@ -127,14 +127,26 @@ io.on('connection', (socket) => {
   };
 
   // ---------- Hesap ----------
-  socket.on('register', (_payload, ack) => {
-    const { user, token } = db.createUser();
+  socket.on('register', (payload = {}, ack) => {
+    const { user, token } = db.createUser(payload?.backup || {});
     socket.data.userId = user.id;
     ack?.({ ok: true, token, profile: db.publicProfile(user) });
   });
 
-  socket.on('auth', ({ token } = {}, ack) => {
-    const user = db.findByToken(token);
+  socket.on('auth', ({ token, backup } = {}, ack) => {
+    let user = db.findByToken(token);
+    if (!user && backup && typeof token === 'string' && token.length >= 16) {
+      // Sunucu yeniden başlamışsa istemcideki yedek profili aynı token ile geri yükle
+      user = db.createUser({ ...backup, token }).user;
+    } else if (user && backup) {
+      // İstemci çevrimdışıyken kullanıcı adı / avatar değiştirdiyse senkronize et
+      if (backup.username && backup.username !== user.username) {
+        db.updateProfile(user, { username: backup.username });
+      }
+      if (backup.avatar && backup.avatar !== user.avatar) {
+        db.updateProfile(user, { avatar: backup.avatar });
+      }
+    }
     if (!user) return ack?.({ ok: false, error: 'invalid_token' });
     socket.data.userId = user.id;
     ack?.({ ok: true, profile: db.publicProfile(user) });

@@ -41,7 +41,7 @@ function App() {
   }, []);
 
   const online = session.status === 'online' && !!session.profile;
-  const playerData = online ? session.profile : guest;
+  const playerData = session.profile || guest;
 
   const [matchQuestions, setMatchQuestions] = useState([]);
   const [arcadeResult, setArcadeResult] = useState(null);
@@ -121,7 +121,11 @@ function App() {
   };
 
   const handleUpdateProfile = async (updates) => {
-    if (!online) return { ok: false, error: 'offline' };
+    if (!online) {
+      const next = { ...(session.profile || guest), ...updates };
+      applyProfile(next);
+      return { ok: true, profile: next };
+    }
     const r = await request('update_profile', updates);
     if (r.ok) applyProfile(r.profile);
     return r;

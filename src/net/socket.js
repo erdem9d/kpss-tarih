@@ -9,12 +9,32 @@ const SERVER_URL =
   (import.meta.env.DEV ? `http://${window.location.hostname}:3001` : window.location.origin);
 
 const TOKEN_KEY = 'kpss_token';
+const PROFILE_KEY = 'kpss_profile_v1';
+
+function loadSavedProfile() {
+  try {
+    const raw = localStorage.getItem(PROFILE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveProfileLocal(profile) {
+  if (!profile) return;
+  try {
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+  } catch {
+    // localStorage dolu veya kapalıysa sessizce geç
+  }
+}
 
 let socket = null;
 const listeners = new Set(); // oturum durumu dinleyicileri
-let state = { status: 'connecting', profile: null }; // connecting | online | offline
+let state = { status: 'connecting', profile: loadSavedProfile() }; // connecting | online | offline
 
 function setState(patch) {
+  if (patch.profile) saveProfileLocal(patch.profile);
   state = { ...state, ...patch };
   listeners.forEach((fn) => fn(state));
 }
@@ -45,13 +65,14 @@ export function request(event, payload) {
 
 async function authenticate() {
   const saved = localStorage.getItem(TOKEN_KEY);
+  const backup = loadSavedProfile();
   if (saved) {
-    const res = await request('auth', { token: saved });
+    const res = await request('auth', { token: saved, backup });
     if (res.ok) return setState({ status: 'online', profile: res.profile });
     if (res.error !== 'invalid_token') return setState({ status: 'offline' });
-    localStorage.removeItem(TOKEN_KEY); // sunucu bu hesabı tanımıyor: yeni hesap açılır
+    localStorage.removeItem(TOKEN_KEY);
   }
-  const res = await request('register');
+  const res = await request('register', { backup });
   if (res.ok) {
     localStorage.setItem(TOKEN_KEY, res.token);
     setState({ status: 'online', profile: res.profile });
