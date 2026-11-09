@@ -28,9 +28,9 @@ export const REWARDS = { win: 25, draw: 15, loss: 10 };
 
 // kind: gems | powerup | avatar_pack | gold_boost
 export const SHOP = {
-  gems_100: { kind: 'gems', amount: 100, coins: 100 },
-  gems_500: { kind: 'gems', amount: 500, coins: 400 },
-  gems_1200: { kind: 'gems', amount: 1200, coins: 800 },
+  gems_100: { kind: 'gems', amount: 100, priceTRY: 29.90 },
+  gems_500: { kind: 'gems', amount: 500, priceTRY: 99.90 },
+  gems_1200: { kind: 'gems', amount: 1200, priceTRY: 199.90 },
   extra_time: { kind: 'powerup', key: 'extraTime', amount: 5, diamonds: 50 },
   eliminate_wrong: { kind: 'powerup', key: 'eliminateWrong', amount: 3, diamonds: 40 },
   shield: { kind: 'powerup', key: 'shield', amount: 3, diamonds: 60 },

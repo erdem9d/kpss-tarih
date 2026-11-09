@@ -217,13 +217,12 @@ export function arcadeReward(user, score) {
 }
 
 // ---------- Mağaza ----------
-export function purchase(user, itemId) {
+export function purchase(user, itemId, { testMode } = {}) {
   const item = SHOP[itemId];
   if (!item) return { ok: false, error: 'unknown_item' };
 
   if (item.kind === 'gems') {
-    if (user.coins < item.coins) return { ok: false, error: 'insufficient_coins' };
-    user.coins -= item.coins;
+    if (!testMode) return { ok: false, error: 'payments_disabled' };
     user.diamonds += item.amount;
     save();
     return { ok: true };

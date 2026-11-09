@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 
 const GEM_PACKS = [
-  { id: 'gems_100', name: '100 Elmas', amount: '100', price: '100 🪙', icon: '💎', size: 44 },
-  { id: 'gems_500', name: '500 Elmas', amount: '500', price: '400 🪙', icon: '💎', size: 54, badge: 'EN ÇOK SATAN' },
-  { id: 'gems_1200', name: '1200 Elmas', amount: '1200', price: '800 🪙', icon: '💎', size: 64, badge: 'EN İYİ DEĞER', best: true },
+  { id: 'gems_100', name: '100 Elmas Paketi', amount: '100', price: '₺29,90', icon: '💎', size: 44, paymentUrl: import.meta.env.VITE_PAY_GEMS_100 || '' },
+  { id: 'gems_500', name: '500 Elmas Paketi', amount: '500', price: '₺99,90', icon: '💎', size: 54, badge: 'EN ÇOK SATAN', paymentUrl: import.meta.env.VITE_PAY_GEMS_500 || '' },
+  { id: 'gems_1200', name: '1200 Elmas Paketi', amount: '1200', price: '₺199,90', icon: '💎', size: 64, badge: 'EN İYİ DEĞER', best: true, paymentUrl: import.meta.env.VITE_PAY_GEMS_1200 || '' },
 ];
 
 const POWERUPS = [
@@ -18,10 +18,10 @@ const COSMETICS = [
 ];
 
 const ERRORS = {
-  insufficient_coins: 'Yeterli altının yok! Düello veya Arcade oynayarak altın kazan 🪙',
   insufficient_diamonds: 'Yeterli elmasın yok. Elmas paketlerine göz at 💎',
   already_owned: 'Bu ürüne zaten sahipsin.',
   payments_disabled: 'Gerçek ödeme henüz aktif değil.',
+  card_invalid: 'Lütfen kart bilgilerini eksiksiz doldurun.',
   offline: 'Sunucuya bağlanılamıyor. İnternetini kontrol et.',
   timeout: 'Sunucu yanıt vermedi. Tekrar dene.',
   not_authenticated: 'Oturum doğrulanamadı. Uygulamayı yeniden aç.',
@@ -51,6 +51,10 @@ export default function ShopScreen({ playerData, online = true, onPurchase, onBa
   const [purchased, setPurchased] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
+  const [cardName, setCardName] = useState('');
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardExpiry, setCardExpiry] = useState('');
+  const [cardCvv, setCardCvv] = useState('');
 
   const handleBuyClick = (item) => {
     setSelectedItem(item);
@@ -59,14 +63,30 @@ export default function ShopScreen({ playerData, online = true, onPurchase, onBa
     setError(null);
   };
 
+  const isGemPack = Boolean(selectedItem?.id?.startsWith('gems_'));
+
   const confirmPurchase = async () => {
     if (busy) return;
+    if (isGemPack) {
+      if (selectedItem?.paymentUrl) {
+        window.open(selectedItem.paymentUrl, '_blank', 'noopener,noreferrer');
+      } else {
+        const digits = cardNumber.replace(/\D/g, '');
+        if (cardName.trim().length < 3 || digits.length < 16 || cardExpiry.trim().length < 4 || cardCvv.trim().length < 3) {
+          setError(ERRORS.card_invalid);
+          return;
+        }
+      }
+    }
     setBusy(true);
     setError(null);
     const res = onPurchase ? await onPurchase(selectedItem) : { ok: true };
     setBusy(false);
     if (res.ok) {
       setPurchased(true);
+      setCardNumber('');
+      setCardExpiry('');
+      setCardCvv('');
       setTimeout(() => setShowModal(false), 1500);
     } else {
       setError(ERRORS[res.error] || 'Satın alma başarısız oldu.');
@@ -152,7 +172,7 @@ export default function ShopScreen({ playerData, online = true, onPurchase, onBa
               <div className="gold-text" style={{ fontSize: 20 }}>{p.amount}</div>
               <div style={{ fontSize: 11, fontWeight: 800, color: 'rgba(255,255,255,0.7)' }}>Elmas</div>
               <button className="btn-gold" style={{ padding: '8px 4px', fontSize: 13, width: '100%', borderRadius: 14, animation: p.best ? 'glow 2s infinite' : undefined }}
-                onClick={() => handleBuyClick({ id: p.id, name: p.name, price: p.price })}>
+                onClick={() => handleBuyClick({ id: p.id, name: p.name, price: p.price, paymentUrl: p.paymentUrl })}>
                 {p.price}
               </button>
             </div>
@@ -175,24 +195,78 @@ export default function ShopScreen({ playerData, online = true, onPurchase, onBa
           position: 'fixed', inset: 0, background: 'rgba(2,6,15,0.85)', backdropFilter: 'blur(4px)',
           display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 100,
         }}>
-          <div className="panel" style={{ width: '82%', maxWidth: 320, padding: 24, textAlign: 'center', animation: 'bounceIn 0.4s ease-out' }}>
+          <div className="panel" style={{ width: '88%', maxWidth: 340, padding: 22, textAlign: 'center', animation: 'bounceIn 0.4s ease-out' }}>
             {purchased ? (
               <div style={{ padding: '16px 0' }}>
                 <div style={{ fontSize: 56, animation: 'bounceIn 0.5s ease-out', filter: 'drop-shadow(0 0 14px rgba(246,200,95,0.9))' }}>✨</div>
-                <div className="gold-text" style={{ fontSize: 18, marginTop: 10 }}>Başarıyla Satın Alındı!</div>
-                <div style={{ color: 'var(--green)', fontWeight: 800, marginTop: 8 }}>{selectedItem?.name}</div>
+                <div className="gold-text" style={{ fontSize: 18, marginTop: 10 }}>Ödeme Onaylandı!</div>
+                <div style={{ color: 'var(--green)', fontWeight: 800, marginTop: 8 }}>{selectedItem?.name} hesabına yüklendi.</div>
               </div>
             ) : (
               <>
-                <h3 className="gold-text" style={{ fontSize: 18, marginBottom: 12 }}>✦ Satın Alım Onayı ✦</h3>
+                <h3 className="gold-text" style={{ fontSize: 18, marginBottom: 10 }}>
+                  {isGemPack ? '💳 Güvenli Kart Ödemesi' : '✦ Satın Alım Onayı ✦'}
+                </h3>
                 <p style={{ fontSize: 14, lineHeight: 1.4 }}>
-                  <b style={{ color: 'var(--gold-300)' }}>{selectedItem?.name}</b> ürününü satın almak istiyor musunuz?
+                  <b style={{ color: 'var(--gold-300)' }}>{selectedItem?.name}</b>
                 </p>
-                <p className="pill" style={{ marginTop: 12, color: 'var(--gold-300)' }}>Fiyat: {selectedItem?.price}</p>
-                {error && <p style={{ marginTop: 12, fontSize: 13, fontWeight: 800, color: '#ff8a8f' }}>{error}</p>}
-                <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+                <p className="pill" style={{ marginTop: 8, color: 'var(--gold-300)', justifyContent: 'center' }}>
+                  Tutar: {selectedItem?.price}
+                </p>
+
+                {isGemPack && !selectedItem?.paymentUrl && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 14, textAlign: 'left' }}>
+                    <input
+                      type="text"
+                      placeholder="Kart Üzerindeki İsim"
+                      value={cardName}
+                      onChange={(e) => setCardName(e.target.value)}
+                      style={{ width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid rgba(212,168,67,0.5)', background: 'rgba(5,13,31,0.9)', color: '#fff', fontSize: 13 }}
+                    />
+                    <input
+                      type="tel"
+                      maxLength={19}
+                      placeholder="Kart Numarası (16 Hane)"
+                      value={cardNumber}
+                      onChange={(e) => {
+                        const d = e.target.value.replace(/\D/g, '').slice(0, 16);
+                        setCardNumber(d.replace(/(.{4})/g, '$1 ').trim());
+                      }}
+                      style={{ width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid rgba(212,168,67,0.5)', background: 'rgba(5,13,31,0.9)', color: '#fff', fontSize: 13, letterSpacing: 1 }}
+                    />
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <input
+                        type="tel"
+                        maxLength={5}
+                        placeholder="AA/YY"
+                        value={cardExpiry}
+                        onChange={(e) => {
+                          const d = e.target.value.replace(/\D/g, '').slice(0, 4);
+                          setCardExpiry(d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d);
+                        }}
+                        style={{ flex: 1, padding: '9px 12px', borderRadius: 10, border: '1px solid rgba(212,168,67,0.5)', background: 'rgba(5,13,31,0.9)', color: '#fff', fontSize: 13, textAlign: 'center' }}
+                      />
+                      <input
+                        type="password"
+                        maxLength={4}
+                        placeholder="CVV"
+                        value={cardCvv}
+                        onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                        style={{ width: 90, padding: '9px 12px', borderRadius: 10, border: '1px solid rgba(212,168,67,0.5)', background: 'rgba(5,13,31,0.9)', color: '#fff', fontSize: 13, textAlign: 'center' }}
+                      />
+                    </div>
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', textAlign: 'center', marginTop: 2 }}>
+                      🔒 256-Bit SSL & 3D Secure Güvencesi
+                    </div>
+                  </div>
+                )}
+
+                {error && <p style={{ marginTop: 10, fontSize: 12, fontWeight: 800, color: '#ff8a8f' }}>{error}</p>}
+                <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
                   <button className="btn-navy" style={{ flex: 1, padding: '10px' }} onClick={() => setShowModal(false)}>İptal</button>
-                  <button className="btn-gold" style={{ flex: 1, padding: '10px', fontSize: 14 }} onClick={confirmPurchase} disabled={busy}>{busy ? '...' : 'Onayla'}</button>
+                  <button className="btn-gold" style={{ flex: 1, padding: '10px', fontSize: 14 }} onClick={confirmPurchase} disabled={busy}>
+                    {busy ? 'İşleniyor...' : (isGemPack ? 'Öde & Satın Al' : 'Onayla')}
+                  </button>
                 </div>
               </>
             )}
