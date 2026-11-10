@@ -199,8 +199,10 @@ export class Room {
       rewards[p.id] = this.settle?.(p, {
         won,
         draw,
+        opponentId: o.userId || null,
         opponentElo: o.elo,
         opponentName: o.name,
+        opponentAvatar: o.avatar,
         isBot: !!o.isBot,
         correct: this.stats[p.id].correct,
       }) ?? null;

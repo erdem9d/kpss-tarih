@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
 
+const LEAGUES = [
+  { name: 'Bronz', min: 0, icon: '🥉', color: '#cd7f32' },
+  { name: 'Gümüş', min: 1150, icon: '🥈', color: '#c0c8d4' },
+  { name: 'Altın', min: 1230, icon: '🥇', color: '#f6c85f' },
+  { name: 'Elmas', min: 1320, icon: '💎', color: '#4cc9f0' },
+  { name: 'Efsane', min: 1450, icon: '👑', color: '#c77dff' },
+];
+
 const LEAGUE_ICONS = { Bronz: '🥉', Gümüş: '🥈', Altın: '🥇', Elmas: '💎', Efsane: '👑' };
 const LEAGUE_COLORS = { Bronz: '#cd7f32', Gümüş: '#c0c8d4', Altın: '#f6c85f', Elmas: '#4cc9f0', Efsane: '#c77dff' };
 
@@ -24,10 +32,13 @@ export default function ProfileScreen({ playerData, online = true, onUpdateProfi
   const st = p.stats || {};
   const total = st.totalGames || 0;
   const winRate = total ? Math.round(((st.wins || 0) / total) * 100) : 0;
-  const league = p.league || 'Gümüş';
   const elo = p.elo ?? 1200;
-  const next = p.nextLeague;
-  const from = p.leagueMin ?? 0;
+
+  let curLeague = LEAGUES[0];
+  for (const l of LEAGUES) if (elo >= l.min) curLeague = l;
+  const league = curLeague.name;
+  const from = curLeague.min;
+  const next = LEAGUES.find((l) => l.min > elo) || null;
   const progress = next ? Math.min(100, Math.max(0, ((elo - from) / (next.min - from)) * 100)) : 100;
   const avatars = p.unlockedAvatars || BASE_AVATARS;
 
@@ -90,25 +101,53 @@ export default function ProfileScreen({ playerData, online = true, onUpdateProfi
         <div style={{
           width: 110, height: 110, borderRadius: '50%', display: 'grid', placeItems: 'center', fontSize: '3.4rem',
           background: 'radial-gradient(circle at 30% 25%, var(--navy-600), var(--navy-900))',
-          border: '5px solid var(--gold-400)', boxShadow: '0 0 30px rgba(246,200,95,0.75), inset 0 0 14px rgba(0,0,0,0.6)',
+          border: `5px solid ${LEAGUE_COLORS[league]}`, boxShadow: `0 0 30px ${LEAGUE_COLORS[league]}99, inset 0 0 14px rgba(0,0,0,0.6)`,
           animation: 'pulse 3s ease-in-out infinite',
         }}>{p.avatar || '👤'}</div>
         <h2 className="title-font" style={{ fontSize: '1.5rem', margin: '14px 0 8px' }}>{p.username || 'Oyuncu'}</h2>
-        <span className="pill" style={{ color: LEAGUE_COLORS[league], borderColor: LEAGUE_COLORS[league], fontSize: '0.85rem' }}>
+        <span className="pill" style={{ color: LEAGUE_COLORS[league], borderColor: LEAGUE_COLORS[league], fontSize: '0.88rem' }}>
           {LEAGUE_ICONS[league]} {league} Ligi · {elo} ELO
         </span>
 
         <div style={{ width: '100%', marginTop: 18 }}>
           <div className="timer-track" style={{ height: 16 }}>
-            <div className="timer-fill" style={{ width: `${progress}%`, background: 'linear-gradient(90deg, var(--gold-700), var(--gold-400), var(--gold-300))', transition: 'width .6s' }} />
+            <div className="timer-fill" style={{ width: `${progress}%`, background: `linear-gradient(90deg, var(--gold-700), ${LEAGUE_COLORS[league]}, var(--gold-300))`, transition: 'width .6s' }} />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginTop: 6, fontWeight: 700 }}>
-            <span style={{ color: 'var(--gold-300)' }}>{elo}</span>
+            <span style={{ color: LEAGUE_COLORS[league] }}>{LEAGUE_ICONS[league]} {from} ELO</span>
             {next ? (
-              <span style={{ opacity: 0.75 }}>Sonraki Lig: <span style={{ color: LEAGUE_COLORS[next.name] }}>{next.name}</span> ({next.min})</span>
+              <span style={{ opacity: 0.9 }}>
+                Sonraki: <span style={{ color: LEAGUE_COLORS[next.name] }}>{next.icon} {next.name}</span> (+{Math.max(0, next.min - elo)} ELO kaldı)
+              </span>
             ) : (
-              <span style={{ opacity: 0.75 }}>En üst lig! 👑</span>
+              <span style={{ color: 'var(--gold-300)' }}>En üst lig! 👑</span>
             )}
+          </div>
+
+          {/* 5 Kademeli Lig Yolu */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6, marginTop: 14 }}>
+            {LEAGUES.map((lg) => {
+              const active = lg.name === league;
+              const unlocked = elo >= lg.min;
+              return (
+                <div
+                  key={lg.name}
+                  style={{
+                    background: active ? 'rgba(246,200,95,0.18)' : 'rgba(5,13,31,0.6)',
+                    border: `1.5px solid ${active ? lg.color : unlocked ? 'rgba(212,168,67,0.4)' : 'rgba(255,255,255,0.1)'}`,
+                    borderRadius: 10,
+                    padding: '6px 2px',
+                    textAlign: 'center',
+                    opacity: unlocked ? 1 : 0.55,
+                    boxShadow: active ? `0 0 12px ${lg.color}55` : 'none',
+                  }}
+                >
+                  <div style={{ fontSize: '1.1rem' }}>{lg.icon}</div>
+                  <div style={{ fontSize: '0.62rem', fontWeight: 900, color: lg.color }}>{lg.name}</div>
+                  <div style={{ fontSize: '0.55rem', color: '#9fb0d4', fontWeight: 700 }}>{lg.min}+</div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

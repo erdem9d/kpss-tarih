@@ -133,16 +133,61 @@ const ResultScreen = ({ playerScore, opponentScore, stats, rewards, onPlayAgain,
         ))}
       </div>
 
-      {/* Ödüller */}
-      <div style={{ zIndex: 2, display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center', animation: 'fadeIn 1s ease-out' }}>
+      {/* Ödüller & Lig Durumu */}
+      <div style={{ zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, width: '100%', maxWidth: 400, animation: 'fadeIn 1s ease-out' }}>
         {rewards ? (
           <>
-            <span className="pill" style={{ fontSize: '1rem', padding: '8px 16px', color: 'var(--gold-300)' }}>
-              🪙 +{rewards.coins} Altın{rewards.boosted ? ' (x2 ⚡)' : ''}
-            </span>
-            <span className="pill" style={{ fontSize: '1rem', padding: '8px 16px', color: rewards.eloDelta >= 0 ? 'var(--green)' : 'var(--red)' }}>
-              📈 {rewards.eloDelta >= 0 ? '+' : ''}{rewards.eloDelta} ELO
-            </span>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
+              <span className="pill" style={{ fontSize: '1rem', padding: '8px 16px', color: 'var(--gold-300)' }}>
+                🪙 +{rewards.coins} Altın{rewards.boosted ? ' (x2 ⚡)' : ''}
+              </span>
+              <span className="pill" style={{ fontSize: '1rem', padding: '8px 16px', color: rewards.eloDelta >= 0 ? 'var(--green)' : 'var(--red)' }}>
+                📈 {rewards.eloDelta >= 0 ? '+' : ''}{rewards.eloDelta} ELO
+              </span>
+            </div>
+
+            {rewards.promoted && (
+              <div className="panel" style={{
+                width: '100%', padding: '12px 16px', textAlign: 'center',
+                borderColor: 'var(--gold-300)',
+                background: 'linear-gradient(160deg, rgba(212,168,67,0.45), rgba(10,26,58,0.95))',
+                boxShadow: '0 0 26px rgba(246,200,95,0.65)',
+                animation: 'bounceIn 0.6s ease-out',
+              }}>
+                <div style={{ fontSize: '1.5rem' }}>🎉 {rewards.newLeagueIcon || '🏆'} 🎉</div>
+                <div className="gold-text" style={{ fontSize: '1.2rem', letterSpacing: 2 }}>
+                  LİG ATLADIN: {rewards.newLeague?.toUpperCase()} LİGİ!
+                </div>
+              </div>
+            )}
+
+            {rewards.newLeague && (
+              <div className="panel" style={{ width: '100%', padding: '12px 16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.82rem', fontWeight: 800, marginBottom: 6 }}>
+                  <span style={{ color: rewards.newLeagueColor || 'var(--gold-300)' }}>
+                    {rewards.newLeagueIcon || '🛡️'} {rewards.newLeague} Ligi ({rewards.elo} ELO)
+                  </span>
+                  {rewards.nextLeague ? (
+                    <span style={{ color: '#9fb0d4', fontSize: '0.74rem' }}>
+                      {rewards.nextLeague.icon} {rewards.nextLeague.name}: +{Math.max(0, rewards.nextLeague.min - rewards.elo)} ELO
+                    </span>
+                  ) : (
+                    <span style={{ color: 'var(--gold-300)', fontSize: '0.74rem' }}>👑 En Üst Lig</span>
+                  )}
+                </div>
+                <div className="timer-track" style={{ height: 10 }}>
+                  <div
+                    className="timer-fill"
+                    style={{
+                      width: `${rewards.nextLeague
+                        ? Math.min(100, Math.max(0, ((rewards.elo - (rewards.leagueMin || 0)) / (rewards.nextLeague.min - (rewards.leagueMin || 0))) * 100))
+                        : 100}%`,
+                      background: `linear-gradient(90deg, var(--gold-700), ${rewards.newLeagueColor || 'var(--gold-300)'})`,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
           </>
         ) : (
           <span className="pill" style={{ fontSize: '.85rem', padding: '8px 16px', opacity: 0.8 }}>

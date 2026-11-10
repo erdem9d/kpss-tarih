@@ -128,24 +128,21 @@ io.on('connection', (socket) => {
 
   // ---------- Hesap ----------
   socket.on('register', (payload = {}, ack) => {
+    if (Array.isArray(payload?.peers)) db.importPeers(payload.peers);
     const { user, token } = db.createUser(payload?.backup || {});
     socket.data.userId = user.id;
     ack?.({ ok: true, token, profile: db.publicProfile(user) });
   });
 
-  socket.on('auth', ({ token, backup } = {}, ack) => {
+  socket.on('auth', ({ token, backup, peers } = {}, ack) => {
+    if (Array.isArray(peers)) db.importPeers(peers);
     let user = db.findByToken(token);
     if (!user && backup && typeof token === 'string' && token.length >= 16) {
       // Sunucu yeniden başlamışsa istemcideki yedek profili aynı token ile geri yükle
       user = db.createUser({ ...backup, token }).user;
     } else if (user && backup) {
-      // İstemci çevrimdışıyken kullanıcı adı / avatar değiştirdiyse senkronize et
-      if (backup.username && backup.username !== user.username) {
-        db.updateProfile(user, { username: backup.username });
-      }
-      if (backup.avatar && backup.avatar !== user.avatar) {
-        db.updateProfile(user, { avatar: backup.avatar });
-      }
+      // İstemci çevrimdışıyken veya sunucu yeniden başladığında profili ve geçmiş rakipleri senkronize et
+      db.syncUserWithBackup(user, backup);
     }
     if (!user) return ack?.({ ok: false, error: 'invalid_token' });
     socket.data.userId = user.id;
@@ -249,4 +246,11 @@ io.on('connection', (socket) => {
 
 http.listen(PORT, '0.0.0.0', () => {
   console.log(`Düello sunucusu hazır: http://localhost:${PORT}  (bot bekleme: ${BOT_AFTER_MS / 1000}sn, test satın alma: ${TEST_PURCHASES ? 'açık' : 'kapalı'})`);
+  // Render ücretsiz sunucusunun uykuya geçip verileri sıfırlamasını önlemek için periyodik sağlık kontrolü
+  const extUrl = process.env.RENDER_EXTERNAL_URL;
+  if (extUrl) {
+    setInterval(() => {
+      fetch(`${extUrl}/health`).catch(() => {});
+    }, 10 * 60 * 1000);
+  }
 });

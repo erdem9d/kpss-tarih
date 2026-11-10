@@ -2,11 +2,11 @@
 // Fiyatlar ve ödüller yalnızca sunucuda belirlenir; istemci sadece ürün kimliği gönderir.
 
 export const LEAGUES = [
-  { name: 'Bronz', min: 0 },
-  { name: 'Gümüş', min: 1000 },
-  { name: 'Altın', min: 1400 },
-  { name: 'Elmas', min: 1800 },
-  { name: 'Efsane', min: 2200 },
+  { name: 'Bronz', min: 0, icon: '🥉', color: '#cd7f32' },
+  { name: 'Gümüş', min: 1150, icon: '🥈', color: '#c0c8d4' },
+  { name: 'Altın', min: 1230, icon: '🥇', color: '#f6c85f' },
+  { name: 'Elmas', min: 1320, icon: '💎', color: '#4cc9f0' },
+  { name: 'Efsane', min: 1450, icon: '👑', color: '#c77dff' },
 ];
 
 export function leagueOf(elo) {
@@ -18,6 +18,7 @@ export function leagueOf(elo) {
 export function nextLeagueOf(elo) {
   return LEAGUES.find((l) => l.min > elo) || null;
 }
+
 
 export const BASE_AVATARS = ['👤', '🧑‍🎓', '🥷', '🤴', '👸', '🦁', '🦅', '🐺', '🌙', '⚔️'];
 export const PREMIUM_AVATARS = ['🐉', '👑', '🏹', '🛡️', '🗡️', '🐎', '🏰', '📜', '🔱', '🦂'];

@@ -12,6 +12,27 @@ import Navbar from './components/UI/Navbar';
 import { questions } from './data/questions';
 import { startSession, subscribeSession, request, applyProfile } from './net/socket';
 
+const LEAGUES = [
+  { name: 'Bronz', min: 0, icon: '🥉', color: '#cd7f32' },
+  { name: 'Gümüş', min: 1150, icon: '🥈', color: '#c0c8d4' },
+  { name: 'Altın', min: 1230, icon: '🥇', color: '#f6c85f' },
+  { name: 'Elmas', min: 1320, icon: '💎', color: '#4cc9f0' },
+  { name: 'Efsane', min: 1450, icon: '👑', color: '#c77dff' },
+];
+
+function computeLeagueMeta(elo = 1200) {
+  let cur = LEAGUES[0];
+  for (const l of LEAGUES) if (elo >= l.min) cur = l;
+  const next = LEAGUES.find((l) => l.min > elo) || null;
+  return {
+    league: cur.name,
+    leagueIcon: cur.icon,
+    leagueColor: cur.color,
+    leagueMin: cur.min,
+    nextLeague: next ? { name: next.name, min: next.min, icon: next.icon, color: next.color } : null,
+  };
+}
+
 // Sunucuya bağlanılamazken kullanılan geçici misafir verisi (kaydedilmez).
 const GUEST = {
   username: 'Misafir',
@@ -19,9 +40,7 @@ const GUEST = {
   coins: 500,
   diamonds: 0,
   elo: 1200,
-  league: 'Gümüş',
-  nextLeague: { name: 'Altın', min: 1400 },
-  leagueMin: 1000,
+  ...computeLeagueMeta(1200),
   stats: { totalGames: 0, wins: 0, losses: 0, draws: 0, correctAnswers: 0 },
   inventory: { extraTime: 0, eliminateWrong: 0, shield: 0 },
   unlockedAvatars: ['👤', '🧑‍🎓', '🥷', '🤴', '👸', '🦁', '🦅', '🐺', '🌙', '⚔️'],
@@ -41,7 +60,8 @@ function App() {
   }, []);
 
   const online = session.status === 'online' && !!session.profile;
-  const playerData = session.profile || guest;
+  const rawPlayer = session.profile || guest;
+  const playerData = { ...rawPlayer, ...computeLeagueMeta(rawPlayer.elo ?? 1200) };
 
   const [matchQuestions, setMatchQuestions] = useState([]);
   const [arcadeResult, setArcadeResult] = useState(null);
@@ -214,7 +234,7 @@ function App() {
       )}
 
       {screen === 'leaderboard' && (
-        <LeaderboardScreen online={online} onBack={goMenu} />
+        <LeaderboardScreen playerData={playerData} online={online} onBack={goMenu} />
       )}
 
       {screen === 'profile' && (

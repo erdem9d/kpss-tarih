@@ -6,18 +6,35 @@ const MODES = [
   { key: 'quick', icon: '⚡', title: 'HIZLI QUİZ', sub: '10 soruluk hızlı tur' },
 ];
 
-export default function MainMenu({ onStartDuel, onQuickQuiz, onArcade, playerData }) {
+const LEAGUE_META = {
+  Bronz: { icon: '🥉', color: '#cd7f32' },
+  Gümüş: { icon: '🥈', color: '#c0c8d4' },
+  Altın: { icon: '🥇', color: '#f6c85f' },
+  Elmas: { icon: '💎', color: '#4cc9f0' },
+  Efsane: { icon: '👑', color: '#c77dff' },
+};
+
+export default function MainMenu({ onStartDuel, onQuickQuiz, onArcade, onNavigate, playerData }) {
   const handlers = { duel: onStartDuel, arcade: onArcade, quick: onQuickQuiz };
   const name = playerData?.username || 'Oyuncu';
+  const leagueName = playerData?.league || 'Gümüş';
+  const lg = LEAGUE_META[leagueName] || LEAGUE_META.Gümüş;
+  const elo = playerData?.elo ?? 1200;
 
   return (
     <div style={{ minHeight: '100vh', padding: '16px 16px 90px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
       {/* Profil çubuğu */}
       <div className="panel" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', animation: 'fadeIn .5s both' }}>
-        <div style={{ width: 52, height: 52, borderRadius: '50%', display: 'grid', placeItems: 'center', fontSize: '1.7rem', background: 'radial-gradient(circle, var(--navy-600), var(--navy-900))', border: '3px solid var(--gold-400)', boxShadow: '0 0 14px rgba(246,200,95,.5)' }}>{playerData?.avatar || '👤'}</div>
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          onClick={() => onNavigate?.('profile')}
+          style={{ width: 52, height: 52, borderRadius: '50%', display: 'grid', placeItems: 'center', fontSize: '1.7rem', background: 'radial-gradient(circle, var(--navy-600), var(--navy-900))', border: `3px solid ${lg.color}`, boxShadow: `0 0 14px ${lg.color}88`, cursor: 'pointer' }}
+        >{playerData?.avatar || '👤'}</div>
+        <div style={{ flex: 1, minWidth: 0, cursor: 'pointer' }} onClick={() => onNavigate?.('leaderboard')}>
           <div style={{ fontWeight: 900, fontSize: '1.05rem', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
-          <div style={{ fontSize: '.75rem', color: 'var(--gold-300)', fontWeight: 700 }}>🛡️ {playerData?.league || 'Gümüş'} Lig</div>
+          <div style={{ fontSize: '.76rem', color: lg.color, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 5, marginTop: 2 }}>
+            <span>{lg.icon} {leagueName} Ligi</span>
+            <span style={{ color: 'var(--gold-300)', opacity: 0.9 }}>• {elo} ELO</span>
+          </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           <span className="pill">🪙 {playerData?.gold ?? 0}</span>
